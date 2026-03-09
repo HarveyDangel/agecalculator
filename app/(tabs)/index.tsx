@@ -1,98 +1,195 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import React, { useState } from "react";
+import { Platform, Pressable, StyleSheet, Text } from "react-native";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { ThemedCard } from "@/components/themed-card";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { Fonts } from "@/constants/theme";
+
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+	const [date, setDate] = useState<Date>(new Date());
+	const [show, setShow] = useState(false);
+	const [age, setAge] = useState<{
+		years: number;
+		months: number;
+		days: number;
+	} | null>(null);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+	const calculateAge = () => {
+		const today = new Date();
+
+		let years = today.getFullYear() - date.getFullYear();
+		let months = today.getMonth() - date.getMonth();
+		let days = today.getDate() - date.getDate();
+
+		if (days < 0) {
+			months--;
+			days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+		}
+
+		if (months < 0) {
+			years--;
+			months += 12;
+		}
+
+		setAge({ years, months, days });
+	};
+
+	const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+		setShow(false);
+		if (selectedDate) setDate(selectedDate);
+	};
+
+	return (
+		<ThemedView style={styles.container}>
+			<ThemedCard style={styles.card}>
+				<ThemedText
+					type="title"
+					style={{
+						fontFamily: Fonts.rounded,
+            paddingBottom:20,
+					}}
+				>
+					Age Calculator
+				</ThemedText>
+
+				<ThemedText style={styles.dateText}>{date.toDateString()}</ThemedText>
+
+				{/* Date Button */}
+				<Pressable
+					style={styles.secondaryButton}
+					onPress={() => {
+						if (Platform.OS !== "web") {
+							setShow(true);
+						}
+					}}
+				>
+					<ThemedText style={styles.secondaryButtonText}>
+						Select Birthdate
+					</ThemedText>
+				</Pressable>
+
+				{/* Web Picker */}
+				{Platform.OS === "web" && (
+					<input
+						type="date"
+						value={date.toISOString().split("T")[0]}
+						onChange={(e) => setDate(new Date(e.target.value))}
+						style={{
+							marginTop: 10,
+							padding: 8,
+							fontSize: 16,
+							borderRadius: 6,
+						}}
+					/>
+				)}
+
+				{/* Mobile Picker */}
+				{Platform.OS !== "web" && show && (
+					<DateTimePicker
+						value={date}
+						mode="date"
+						display="default"
+						onChange={onChange}
+					/>
+				)}
+
+				{/* Calculate Button */}
+				<Pressable style={styles.primaryButton} onPress={calculateAge}>
+					<Text style={styles.primaryButtonText}>Calculate Age</Text>
+				</Pressable>
+
+				{/* Result */}
+				{age && (
+					<ThemedView style={styles.resultBox}>
+						<ThemedText style={styles.resultTitle}>Your Age</ThemedText>
+						<ThemedText style={styles.resultText}>{age.years} Years</ThemedText>
+						<ThemedText style={styles.resultText}>
+							{age.months} Months
+						</ThemedText>
+						<ThemedText style={styles.resultText}>{age.days} Days</ThemedText>
+					</ThemedView>
+				)}
+			</ThemedCard>
+		</ThemedView>
+	);
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+	// titleContainer: {
+	//   flexDirection: 'row',
+	//   gap: 8,
+	// },
+	container: {
+		flex: 1,
+		// backgroundColor: "#f2f4f8",
+		justifyContent: "center",
+		alignItems: "center",
+		padding: 20,
+	},
+	card: {
+		width: "100%",
+		maxWidth: 400,
+		// backgroundColor: "#ffffff",
+		borderRadius: 20,
+		padding: 25,
+		shadowColor: "#000",
+		shadowOpacity: 0.1,
+		shadowRadius: 10,
+		elevation: 5,
+	},
+	title: {
+		fontSize: 26,
+		fontWeight: "bold",
+		textAlign: "center",
+		marginBottom: 20,
+	},
+	dateText: {
+		textAlign: "center",
+		fontSize: 16,
+		marginBottom: 15,
+		color: "#555",
+	},
+	primaryButton: {
+		backgroundColor: "#4f46e5",
+		paddingVertical: 14,
+		borderRadius: 12,
+		marginTop: 15,
+	},
+	primaryButtonText: {
+		color: "#fff",
+		textAlign: "center",
+		fontWeight: "600",
+		fontSize: 16,
+	},
+	secondaryButton: {
+		backgroundColor: "#e5e7eb",
+		paddingVertical: 12,
+		borderRadius: 12,
+	},
+	secondaryButtonText: {
+		textAlign: "center",
+		fontWeight: "500",
+		fontSize: 15,
+	},
+	resultBox: {
+		marginTop: 25,
+		// backgroundColor: "#eef2ff",
+		padding: 15,
+		borderRadius: 15,
+		alignItems: "center",
+	},
+	resultTitle: {
+		fontWeight: "bold",
+		fontSize: 18,
+		marginBottom: 8,
+	},
+	resultText: {
+		fontSize: 16,
+		marginVertical: 2,
+	},
 });
