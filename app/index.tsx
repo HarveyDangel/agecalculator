@@ -1,16 +1,19 @@
 import DateTimePicker, {
-  DateTimePickerEvent,
+	DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
-import { Platform, Pressable, StyleSheet, Text } from "react-native";
+import {
+	Platform,
+	Pressable,
+	StyleSheet,
+	Text,
+	View,
+	ScrollView,
+} from "react-native";
 
-import { ThemedCard } from "@/components/themed-card";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Fonts } from "@/constants/theme";
+import { ThemedCard } from "@/components/ui/ThemedCard";
 
-
-export default function HomeScreen() {
+export default function Index() {
 	const [date, setDate] = useState<Date>(new Date());
 	const [show, setShow] = useState(false);
 	const [age, setAge] = useState<{
@@ -45,19 +48,18 @@ export default function HomeScreen() {
 	};
 
 	return (
-		<ThemedView style={styles.container}>
-			<ThemedCard style={styles.card}>
-				<ThemedText
-					type="title"
+		<ScrollView contentContainerStyle={styles.container}>
+			<ThemedCard>
+				<Text
 					style={{
-						fontFamily: Fonts.rounded,
-            paddingBottom:20,
+						fontSize: 26,
+						paddingBottom: 20,
 					}}
 				>
 					Age Calculator
-				</ThemedText>
+				</Text>
 
-				<ThemedText style={styles.dateText}>{date.toDateString()}</ThemedText>
+				<Text style={styles.dateText}>{date.toDateString()}</Text>
 
 				{/* Date Button */}
 				<Pressable
@@ -68,9 +70,7 @@ export default function HomeScreen() {
 						}
 					}}
 				>
-					<ThemedText style={styles.secondaryButtonText}>
-						Select Birthdate
-					</ThemedText>
+					<Text style={styles.secondaryButtonText}>Select Birthdate</Text>
 				</Pressable>
 
 				{/* Web Picker */}
@@ -78,7 +78,11 @@ export default function HomeScreen() {
 					<input
 						type="date"
 						value={date.toISOString().split("T")[0]}
-						onChange={(e) => setDate(new Date(e.target.value))}
+						max={new Date().toISOString().split("T")[0]}
+						onChange={(e) => {
+							if (!e.target.value) return;
+							setDate(new Date(e.target.value));
+						}}
 						style={{
 							marginTop: 10,
 							padding: 8,
@@ -94,6 +98,7 @@ export default function HomeScreen() {
 						value={date}
 						mode="date"
 						display="default"
+						maximumDate={date}
 						onChange={onChange}
 					/>
 				)}
@@ -105,17 +110,15 @@ export default function HomeScreen() {
 
 				{/* Result */}
 				{age && (
-					<ThemedView style={styles.resultBox}>
-						<ThemedText style={styles.resultTitle}>Your Age</ThemedText>
-						<ThemedText style={styles.resultText}>{age.years} Years</ThemedText>
-						<ThemedText style={styles.resultText}>
-							{age.months} Months
-						</ThemedText>
-						<ThemedText style={styles.resultText}>{age.days} Days</ThemedText>
-					</ThemedView>
+					<View style={styles.resultBox}>
+						<Text style={styles.resultTitle}>Your Age</Text>
+						<Text style={styles.resultText}>{age.years} Years</Text>
+						<Text style={styles.resultText}>{age.months} Months</Text>
+						<Text style={styles.resultText}>{age.days} Days</Text>
+					</View>
 				)}
 			</ThemedCard>
-		</ThemedView>
+		</ScrollView>
 	);
 }
 
@@ -126,15 +129,14 @@ const styles = StyleSheet.create({
 	// },
 	container: {
 		flex: 1,
-		// backgroundColor: "#f2f4f8",
 		justifyContent: "center",
 		alignItems: "center",
 		padding: 20,
 	},
 	card: {
 		width: "100%",
+		backgroundColor: "#fff",
 		maxWidth: 400,
-		// backgroundColor: "#ffffff",
 		borderRadius: 20,
 		padding: 25,
 		shadowColor: "#000",
@@ -178,7 +180,7 @@ const styles = StyleSheet.create({
 	},
 	resultBox: {
 		marginTop: 25,
-		// backgroundColor: "#eef2ff",
+		backgroundColor: "#eef2ff",
 		padding: 15,
 		borderRadius: 15,
 		alignItems: "center",
