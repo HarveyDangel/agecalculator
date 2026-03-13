@@ -5,17 +5,18 @@ import React, { useState } from "react";
 import {
 	Platform,
 	Pressable,
+	ScrollView,
 	StyleSheet,
 	Text,
 	View,
-	ScrollView,
 } from "react-native";
 
 import { ThemedCard } from "@/components/ui/ThemedCard";
+import { ThemedText } from "@/components/ui/ThemedText";
 
 export default function Index() {
 	const [date, setDate] = useState<Date>(new Date());
-	const [show, setShow] = useState(false);
+	const [showPicker, setShowPicker] = useState(false);
 	const [age, setAge] = useState<{
 		years: number;
 		months: number;
@@ -43,30 +44,27 @@ export default function Index() {
 	};
 
 	const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-		setShow(false);
+		setShowPicker(false);
 		if (selectedDate) setDate(selectedDate);
 	};
 
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
 			<ThemedCard>
-				<Text
-					style={{
-						fontSize: 26,
-						paddingBottom: 20,
-					}}
+				<ThemedText
+					style={styles.title}
 				>
 					Age Calculator
-				</Text>
+				</ThemedText>
 
-				<Text style={styles.dateText}>{date.toDateString()}</Text>
+				<ThemedText style={styles.dateText}>{date.toLocaleDateString()}</ThemedText>
 
 				{/* Date Button */}
 				<Pressable
 					style={styles.secondaryButton}
 					onPress={() => {
 						if (Platform.OS !== "web") {
-							setShow(true);
+							setShowPicker(true);
 						}
 					}}
 				>
@@ -81,7 +79,8 @@ export default function Index() {
 						max={new Date().toISOString().split("T")[0]}
 						onChange={(e) => {
 							if (!e.target.value) return;
-							setDate(new Date(e.target.value));
+							const selected = new Date(e.target.value + "T00:00:00");
+							setDate(selected);
 						}}
 						style={{
 							marginTop: 10,
@@ -93,12 +92,12 @@ export default function Index() {
 				)}
 
 				{/* Mobile Picker */}
-				{Platform.OS !== "web" && show && (
+				{Platform.OS !== "web" && showPicker && (
 					<DateTimePicker
 						value={date}
 						mode="date"
 						display="default"
-						maximumDate={date}
+						maximumDate={new Date()}
 						onChange={onChange}
 					/>
 				)}
@@ -111,10 +110,12 @@ export default function Index() {
 				{/* Result */}
 				{age && (
 					<View style={styles.resultBox}>
-						<Text style={styles.resultTitle}>Your Age</Text>
-						<Text style={styles.resultText}>{age.years} Years</Text>
-						<Text style={styles.resultText}>{age.months} Months</Text>
-						<Text style={styles.resultText}>{age.days} Days</Text>
+						<ThemedText style={styles.resultTitle}>Your Age</ThemedText>
+						<ThemedText style={styles.resultText}>{age.years} Years</ThemedText>
+						<ThemedText style={styles.resultText}>
+							{age.months} Months
+						</ThemedText>
+						<ThemedText style={styles.resultText}>{age.days} Days</ThemedText>
 					</View>
 				)}
 			</ThemedCard>
@@ -135,7 +136,7 @@ const styles = StyleSheet.create({
 	},
 	card: {
 		width: "100%",
-		backgroundColor: "#fff",
+		// backgroundColor: "#fff",
 		maxWidth: 400,
 		borderRadius: 20,
 		padding: 25,
@@ -154,7 +155,7 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		fontSize: 16,
 		marginBottom: 15,
-		color: "#555",
+		// color: "#555",
 	},
 	primaryButton: {
 		backgroundColor: "#4f46e5",
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
 	},
 	resultBox: {
 		marginTop: 25,
-		backgroundColor: "#eef2ff",
+		// backgroundColor: "#eef2ff",
 		padding: 15,
 		borderRadius: 15,
 		alignItems: "center",
