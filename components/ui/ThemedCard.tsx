@@ -17,9 +17,12 @@ export function ThemedCard({ lightColor, darkColor, style, ...otherProps }: Them
 const styles = StyleSheet.create({
   card: {
     borderRadius: 20,
-    padding: 20,
+    padding: 25,
     width: "100%",
     maxWidth: 400,
     elevation: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
   },
 });

@@ -1,7 +1,7 @@
 import DateTimePicker, {
 	DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Platform,
 	Pressable,
@@ -11,36 +11,28 @@ import {
 	View,
 } from "react-native";
 
+import { calculateAge } from "@/utils/calculateAge";
+
+import { ThemedScrollView } from "@/components/ui/ThemedScrollView";
 import { ThemedCard } from "@/components/ui/ThemedCard";
 import { ThemedText } from "@/components/ui/ThemedText";
+import { ThemedView } from "@/components/ui/ThemedView";
 
 export default function Index() {
 	const [date, setDate] = useState<Date>(new Date());
 	const [showPicker, setShowPicker] = useState(false);
-	const [age, setAge] = useState<{
-		years: number;
-		months: number;
-		days: number;
-	} | null>(null);
+	const [mode, setMode] = useState<"years" | "months">("years");
+	const [age, setAge] = useState<number | null>(null);
 
-	const calculateAge = () => {
-		const today = new Date();
-
-		let years = today.getFullYear() - date.getFullYear();
-		let months = today.getMonth() - date.getMonth();
-		let days = today.getDate() - date.getDate();
-
-		if (days < 0) {
-			months--;
-			days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+	useEffect(() => {
+		if (age !== null) {
+			setAge(calculateAge(date, mode));
 		}
+	}, [mode]);
 
-		if (months < 0) {
-			years--;
-			months += 12;
-		}
-
-		setAge({ years, months, days });
+	const handleCalculateAge = () => {
+		const calculatedAge = calculateAge(date, mode);
+		setAge(calculatedAge);
 	};
 
 	const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
@@ -49,27 +41,45 @@ export default function Index() {
 	};
 
 	return (
-		<ScrollView contentContainerStyle={styles.container}>
+		<ThemedScrollView>
 			<ThemedCard>
-				<ThemedText
-					style={styles.title}
-				>
-					Age Calculator
-				</ThemedText>
+				<ThemedText style={styles.title}>Age Calculator</ThemedText>
 
-				<ThemedText style={styles.dateText}>{date.toLocaleDateString()}</ThemedText>
+				<ThemedText style={styles.dateText}>{date.toDateString()}</ThemedText>
 
 				{/* Date Button */}
 				<Pressable
-					style={styles.secondaryButton}
+					style={styles.primaryButton}
 					onPress={() => {
 						if (Platform.OS !== "web") {
 							setShowPicker(true);
 						}
 					}}
 				>
-					<Text style={styles.secondaryButtonText}>Select Birthdate</Text>
+					<Text style={styles.primaryButtonText}>Select Birthdate</Text>
 				</Pressable>
+
+				<View style={styles.modeSwitch}>
+					<Pressable
+						style={[
+							styles.modeButton,
+							mode === "years" && styles.modeButtonActive,
+						]}
+						onPress={() => setMode("years")}
+					>
+						<Text style={styles.primaryButtonText}>By Years</Text>
+					</Pressable>
+
+					<Pressable
+						style={[
+							styles.modeButton,
+							mode === "months" && styles.modeButtonActive,
+						]}
+						onPress={() => setMode("months")}
+					>
+						<Text style={styles.primaryButtonText}>By Months</Text>
+					</Pressable>
+				</View>
 
 				{/* Web Picker */}
 				{Platform.OS === "web" && (
@@ -103,36 +113,30 @@ export default function Index() {
 				)}
 
 				{/* Calculate Button */}
-				<Pressable style={styles.primaryButton} onPress={calculateAge}>
+				<Pressable style={styles.primaryButton} onPress={handleCalculateAge}>
 					<Text style={styles.primaryButtonText}>Calculate Age</Text>
 				</Pressable>
 
 				{/* Result */}
-				{age && (
+				{age !== null && (
 					<View style={styles.resultBox}>
 						<ThemedText style={styles.resultTitle}>Your Age</ThemedText>
-						<ThemedText style={styles.resultText}>{age.years} Years</ThemedText>
+
 						<ThemedText style={styles.resultText}>
-							{age.months} Months
+							{age} {mode === "years" ? "Years Old" : "Months Old"}
 						</ThemedText>
-						<ThemedText style={styles.resultText}>{age.days} Days</ThemedText>
 					</View>
 				)}
 			</ThemedCard>
-		</ScrollView>
+		</ThemedScrollView>
 	);
 }
 
 const styles = StyleSheet.create({
-	// titleContainer: {
-	//   flexDirection: 'row',
-	//   gap: 8,
-	// },
 	container: {
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		padding: 20,
 	},
 	card: {
 		width: "100%",
@@ -194,5 +198,27 @@ const styles = StyleSheet.create({
 	resultText: {
 		fontSize: 16,
 		marginVertical: 2,
+	},
+	modeSwitch: {
+		flexDirection: "row",
+		marginTop: 20,
+		marginBottom: 10,
+		backgroundColor: "#757575",
+		borderRadius: 10,
+	},
+
+	modeButton: {
+		flex: 1,
+		paddingVertical: 10,
+		alignItems: "center",
+		borderRadius: 10,
+	},
+
+	modeButtonActive: {
+		backgroundColor: "#4f46e5",
+	},
+
+	modeText: {
+		fontWeight: "600",
 	},
 });

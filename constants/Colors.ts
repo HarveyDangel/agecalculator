@@ -7,8 +7,8 @@ export const Colors = {
    }, 
    dark : {
       background : "#1e293b",
-      card : "#11181c",
-      text : "#f0f0f0",
+      card : "#11191d",
+      text : "#dfdfdf",
       primary : "#573bf6",
    },
 }
