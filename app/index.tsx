@@ -16,7 +16,7 @@ import { calculateAge } from "@/utils/calculateAge";
 import { ThemedScrollView } from "@/components/ui/ThemedScrollView";
 import { ThemedCard } from "@/components/ui/ThemedCard";
 import { ThemedText } from "@/components/ui/ThemedText";
-import { ThemedView } from "@/components/ui/ThemedView";
+import { PrimaryButton } from "@/components/ui/PrimaryButton";
 
 export default function Index() {
 	const [date, setDate] = useState<Date>(new Date());
@@ -32,7 +32,7 @@ export default function Index() {
 
 	const handleCalculateAge = () => {
 		const calculatedAge = calculateAge(date, mode);
-		setAge(calculatedAge);
+		setAge(calculatedAge)
 	};
 
 	const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
@@ -43,21 +43,19 @@ export default function Index() {
 	return (
 		<ThemedScrollView>
 			<ThemedCard>
-				<ThemedText style={styles.title}>Age Calculator</ThemedText>
+				{/* <ThemedText style={styles.title}>Age Calculator</ThemedText> */}
 
 				<ThemedText style={styles.dateText}>{date.toDateString()}</ThemedText>
 
 				{/* Date Button */}
-				<Pressable
-					style={styles.primaryButton}
+				<PrimaryButton
 					onPress={() => {
 						if (Platform.OS !== "web") {
 							setShowPicker(true);
 						}
 					}}
-				>
-					<Text style={styles.primaryButtonText}>Select Birthdate</Text>
-				</Pressable>
+					title="Select Birthdate">
+				</PrimaryButton>
 
 				<View style={styles.modeSwitch}>
 					<Pressable
@@ -113,9 +111,7 @@ export default function Index() {
 				)}
 
 				{/* Calculate Button */}
-				<Pressable style={styles.primaryButton} onPress={handleCalculateAge}>
-					<Text style={styles.primaryButtonText}>Calculate Age</Text>
-				</Pressable>
+				<PrimaryButton onPress={handleCalculateAge} title="Calculate Age" />
 
 				{/* Result */}
 				{age !== null && (
@@ -138,17 +134,6 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-	card: {
-		width: "100%",
-		// backgroundColor: "#fff",
-		maxWidth: 400,
-		borderRadius: 20,
-		padding: 25,
-		shadowColor: "#000",
-		shadowOpacity: 0.1,
-		shadowRadius: 10,
-		elevation: 5,
-	},
 	title: {
 		fontSize: 26,
 		fontWeight: "bold",
@@ -157,8 +142,10 @@ const styles = StyleSheet.create({
 	},
 	dateText: {
 		textAlign: "center",
-		fontSize: 16,
-		marginBottom: 15,
+		fontSize: 30,
+		fontWeight: "500",
+		marginTop: 20,
+		marginBottom: 50,
 		// color: "#555",
 	},
 	primaryButton: {
@@ -191,12 +178,13 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	resultTitle: {
-		fontWeight: "bold",
-		fontSize: 18,
+		fontWeight: "500",
+		fontSize: 16,
 		marginBottom: 8,
 	},
 	resultText: {
-		fontSize: 16,
+		fontSize: 24,
+		fontWeight: "bold",
 		marginVertical: 2,
 	},
 	modeSwitch: {
