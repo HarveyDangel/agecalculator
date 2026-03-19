@@ -16,13 +16,13 @@ export function ThemedCard({ lightColor, darkColor, style, ...otherProps }: Them
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 20,
+    borderRadius: 30,
     padding: 25,
     width: "100%",
     maxWidth: 400,
-    elevation: 5,
+    elevation: 4,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });

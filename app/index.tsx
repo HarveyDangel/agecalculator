@@ -4,14 +4,24 @@ import DateTimePicker, {
 	DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+	Platform,
+	StyleSheet,
+	Text,
+	View,
+	StatusBar,
+	ScrollView,
+} from "react-native";
 
 import { calculateAge } from "@/utils/calculateAge";
 
+import { ThemedView } from "@/components/ui/ThemedView";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { ThemedCard } from "@/components/ui/ThemedCard";
 import { ThemedScrollView } from "@/components/ui/ThemedScrollView";
 import { ThemedText } from "@/components/ui/ThemedText";
+import CustomSwitch from "@/components/ui/CustomSwitch";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
 	const [date, setDate] = useState<Date>(new Date());
@@ -36,151 +46,125 @@ export default function Index() {
 	};
 
 	return (
-		<>
-			<Stack.Screen options={{ title: "Age Calculator" }} />
-			<ThemedScrollView>
-				{/* <ThemedText style={styles.title}>Age Calculator</ThemedText> */}
-
-				<ThemedCard>
-					<ThemedText style={styles.dateText}>{date.toDateString()}</ThemedText>
-
-					{/* Date Button */}
-					{Platform.OS !== "web" && (
-						<PrimaryButton
-							onPress={() => {
-								if (Platform.OS !== "web") {
-									setShowPicker(true);
-								}
-							}}
-							title="Select Birthdate"
-						></PrimaryButton>
-					)}
-
-					{/* Web Picker */}
-					{Platform.OS === "web" && (
-						<View>
-							<ThemedText
-								style={{ marginBottom: 6, fontSize: 14, fontWeight: "400" }}
-							>
-								Select Date of Birth
-							</ThemedText>
-
-							<input
-								type="date"
-								value={date.toISOString().split("T")[0]}
-								max={new Date().toISOString().split("T")[0]}
-								onChange={(e) => {
-									if (!e.target.value) return;
-									const selected = new Date(e.target.value + "T00:00:00");
-									setDate(selected);
-								}}
-								style={{
-									padding: 8,
-									fontSize: 16,
-									borderRadius: 6,
-									border: "1px solid #ccc",
-								}}
-							/>
-						</View>
-					)}
-
-					{/* Mobile Picker */}
-					{Platform.OS !== "web" && showPicker && (
-						<DateTimePicker
-							value={date}
-							mode="date"
-							display="default"
-							maximumDate={new Date()}
-							onChange={onChange}
+		<SafeAreaProvider>
+			<SafeAreaView style={styles.container} edges={["top"]}>
+				<ThemedScrollView>
+					<View
+						style={{
+							marginTop: 30,
+							marginBottom: 10,
+							width: "90%",
+							maxWidth: 400,
+							alignItems: "center",
+						}}
+					>
+						<CustomSwitch
+							value={mode}
+							onChange={setMode}
+							options={[
+								{ label: "By Years", value: "years" },
+								{ label: "By Months", value: "months" },
+							]}
 						/>
-					)}
-
-					<View style={styles.modeSwitch}>
-						<Pressable
-							style={[
-								styles.modeButton,
-								mode === "years" && styles.modeButtonActive,
-							]}
-							onPress={() => setMode("years")}
-						>
-							<Text style={styles.primaryButtonText}>By Years</Text>
-						</Pressable>
-
-						<Pressable
-							style={[
-								styles.modeButton,
-								mode === "months" && styles.modeButtonActive,
-							]}
-							onPress={() => setMode("months")}
-						>
-							<Text style={styles.primaryButtonText}>By Months</Text>
-						</Pressable>
 					</View>
 
-					{/* Calculate Button */}
-					<PrimaryButton onPress={handleCalculateAge} title="Calculate Age" />
+					<View>
+						<ThemedText style={styles.dateText}>{date.toDateString()}</ThemedText>
+					</View>
 
-					{/* Result */}
-					{age !== null && (
-						<View style={styles.resultBox}>
-							<ThemedText style={styles.resultTitle}>Your Age</ThemedText>
+					<ThemedCard style={styles.addCardStyle}>
+						{/* Result */}
+						{age !== null && (
+							<View style={styles.resultBox}>
+								<ThemedText style={styles.resultTitle}>Your Age</ThemedText>
 
-							<ThemedText style={styles.resultText}>
-								{age} {mode === "years" ? "Years Old" : "Months Old"}
-							</ThemedText>
-						</View>
-					)}
-				</ThemedCard>
-			</ThemedScrollView>
-		</>
+								<ThemedText style={styles.resultText}>
+									{age} {mode === "years" ? "Years Old" : "Months Old"}
+								</ThemedText>
+							</View>
+						)}
+						{/* Date Button */}
+						{Platform.OS !== "web" && (
+							<PrimaryButton
+								onPress={() => {
+									if (Platform.OS !== "web") {
+										setShowPicker(true);
+									}
+								}}
+								title="Select Birthdate"
+								style={{ marginBottom: 20 }}
+							></PrimaryButton>
+						)}
+
+						{/* Web Picker */}
+						{Platform.OS === "web" && (
+							<View>
+								<ThemedText
+									style={{ marginBottom: 6, fontSize: 14, fontWeight: "400" }}
+								>
+									Select Date of Birth
+								</ThemedText>
+
+								<input
+									type="date"
+									value={date.toISOString().split("T")[0]}
+									max={new Date().toISOString().split("T")[0]}
+									onChange={(e) => {
+										if (!e.target.value) return;
+										const selected = new Date(e.target.value + "T00:00:00");
+										setDate(selected);
+									}}
+									style={{
+										padding: 8,
+										fontSize: 16,
+										borderRadius: 6,
+										border: "1px solid #ccc",
+										marginBottom: 10,
+									}}
+								/>
+							</View>
+						)}
+
+						{/* Mobile Picker */}
+						{Platform.OS !== "web" && showPicker && (
+							<DateTimePicker
+								value={date}
+								mode="date"
+								display="default"
+								maximumDate={new Date()}
+								onChange={onChange}
+							/>
+						)}
+
+						{/* Calculate Button */}
+						<PrimaryButton onPress={handleCalculateAge} title="Calculate Age" />
+					</ThemedCard>
+				</ThemedScrollView>
+			</SafeAreaView>
+		</SafeAreaProvider>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: "center",
 		alignItems: "center",
-	},
-	title: {
-		fontSize: 26,
-		fontWeight: "bold",
-		textAlign: "center",
-		marginBottom: 20,
+		paddingTop: StatusBar.currentHeight || 0,
+		width: "100%",
 	},
 	dateText: {
 		textAlign: "center",
-		fontSize: 30,
-		fontWeight: "500",
+		fontSize: 32,
+		fontWeight: "300",
 		marginTop: 20,
 		marginBottom: 50,
-		// color: "#555",
 	},
-	primaryButton: {
-		backgroundColor: "#4f46e5",
-		paddingVertical: 14,
-		borderRadius: 12,
-		marginTop: 15,
-	},
-	primaryButtonText: {
-		color: "#fff",
-		textAlign: "center",
-		fontWeight: "600",
-		fontSize: 16,
-	},
-	secondaryButton: {
-		backgroundColor: "#e5e7eb",
-		paddingVertical: 12,
-		borderRadius: 12,
-	},
-	secondaryButtonText: {
-		textAlign: "center",
-		fontWeight: "500",
-		fontSize: 15,
+	addCardStyle: {
+		paddingBottom: 60,
+		shadowOffset: { width: 0, height: -1 },
 	},
 	resultBox: {
-		marginTop: 25,
-		// backgroundColor: "#eef2ff",
+		marginVertical: 25,
 		padding: 15,
 		borderRadius: 15,
 		alignItems: "center",
@@ -194,27 +178,5 @@ const styles = StyleSheet.create({
 		fontSize: 24,
 		fontWeight: "bold",
 		marginVertical: 2,
-	},
-	modeSwitch: {
-		flexDirection: "row",
-		marginTop: 20,
-		marginBottom: 10,
-		backgroundColor: "#757575",
-		borderRadius: 10,
-	},
-
-	modeButton: {
-		flex: 1,
-		paddingVertical: 10,
-		alignItems: "center",
-		borderRadius: 10,
-	},
-
-	modeButtonActive: {
-		backgroundColor: "#4f46e5",
-	},
-
-	modeText: {
-		fontWeight: "600",
 	},
 });

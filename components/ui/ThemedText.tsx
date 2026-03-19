@@ -16,7 +16,7 @@ export function ThemedText({ lightColor, darkColor, style, ...otherProps }: Them
 
 const styles = StyleSheet.create({
   text: {
-    fontSize: 16,
-   lineHeight: 24,
+   //  fontSize: 16,
+   // lineHeight: 24,
    },
 });
